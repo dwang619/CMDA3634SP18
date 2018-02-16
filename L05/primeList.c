@@ -35,19 +35,20 @@ void main() {
   // make a list of them 
 
   int *primes = (int*) malloc(cnt*sizeof(int));
-  
+ 
+ 
   //loop once more and build the list
+  cnt = 0;
   for (int n = 0; n < N; n++) {
     if (isPrime[n]) {
-      primes[cnt] = n;
+      primes[cnt++] = n;
     }
   }  
  
   //print out what find
   for (int n = 0;n < cnt; n++) {
-    printf("The %d-th prime is %d",n, primes[n]); 
-    //cleanup
-    free(isPrime);
-    free(primes); 
+    printf("The %d-th prime is %d \n",n, primes[n]); 
  }
+
+ free(isPrime);
 }
