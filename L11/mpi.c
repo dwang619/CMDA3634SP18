@@ -2,7 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "mpi.h"
+
 int main(int argc, char **argv) {
+
+  MPI_Init(&argc, &argv);
+ 
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD,
+                &rank);
+  MPI_Comm_size(MPI_COMM_WORLD,
+                &size);
 
   //need running tallies
   long long int Ntotal;
@@ -12,6 +22,7 @@ int main(int argc, char **argv) {
   double seed = 1.0;
   srand48(seed);
 
+/**
   for (long long int n=0; n<1000000000;n++) {
     //gererate two random numbers
     double rand1 = drand48(); //drand48 returns a number between 0 and 1
@@ -28,6 +39,31 @@ int main(int argc, char **argv) {
   double pi = 4.0*Ncircle/ (double) Ntotal;
 
   printf("Our estimate of pi is %f \n", pi);
+**/
+  float val = 1.0; 
+  double pi = 0;
+  float sum = 0;
+  
+  MPI_Allreduce(&val, 
+                &sum, 
+                1,
+                MPI_FLOAT, 
+                MPI_SUM,
+                MPI_COMM_WORLD);
+ 
+  if (rank == 0) {
+    printf("Our estimate of pi is %f \n", pi);
+  }
 
+  for (int r = 0; r < size;r++) {
+
+    if (r == rank) { 
+      sum = sum + pi;
+      pi = sum / r;
+    } 
+    MPI_Barrier(MPI_COMM_WORLD);
+  }
+  
+  MPI_Finalize();
   return 0;
 }
